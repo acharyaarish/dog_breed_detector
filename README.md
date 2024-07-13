@@ -6,7 +6,7 @@ This repository contains the Dog Breed Detector application, a fun game where us
 You can access the game here: http://flask-env.eba-ksnfztgw.ap-southeast-2.elasticbeanstalk.com/
 
 ## Acknowledgments
-Special thanks to Dog CEO's Dog API for providing the free API used to fetch random dog images.
+Special thanks to Dog CEO's Dog API for providing the free API used to fetch random dog images. Their page: https://dog.ceo/dog-api/
 
 ## Table of Contents
 - [Features](#features)
