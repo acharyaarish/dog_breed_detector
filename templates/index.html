@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dog Breed Detector</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <script src="/static/main.js" defer></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #7F7FD5, #91EAE4, #d2ffff, #0694c6, #7bc393, #31b7c2);
+            background-size: 600% 600%;
+            animation: gradientAnimation 30s ease infinite;
+            color: #fff;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #game, #name-input {
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 1rem;
+            max-width: 90%;
+        }
+
+        #dog-image {
+            max-width: 200px;
+            margin: 0 auto 1rem auto;
+            transition: transform 0.3s;
+            border-radius: 10px;
+            display: block;
+        }
+
+        #dog-image:hover {
+            transform: scale(1.05);
+        }
+
+        .score {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #options {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .notification {
+            margin-top: 1rem;
+        }
+
+        #name-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input {
+            margin-bottom: 1rem;
+            max-width: 300px;
+        }
+
+        .button {
+            margin: 0.5rem;
+            transition: background-color 0.3s, transform 0.3s;
+            font-size: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+        }
+
+        .button:hover {
+            background-color: #f39c12;
+            transform: scale(1.05);
+        }
+
+        .title {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: lightUpAnimation 5s infinite;
+        }
+
+        @keyframes lightUpAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .dog-images-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .dog-image-card {
+            width: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .dog-image-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .dog-image-card:hover {
+            transform: scale(1.05);
+        }
+
+        .button.is-info {
+            background-color: #209cee;
+            color: #fff;
+        }
+
+        .button.is-info:hover {
+            background-color: #1a8cd8;
+        }
+
+        .button.is-danger {
+            background-color: #f14668;
+            color: #fff;
+        }
+
+        .button.is-danger:hover {
+            background-color: #e03858;
+        }
+
+        .button.is-primary {
+            background-color: #00d1b2;
+            color: #fff;
+        }
+
+        .button.is-primary:hover {
+            background-color: #00b89c;
+        }
+
+        @media (max-width: 768px) {
+            #dog-image {
+                max-width: 150px;
+            }
+
+            .button {
+                font-size: 1.2rem;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        #error-notification {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Dog Breed Detector</h1>
+            <div id="name-input">
+                <input id="user-name" class="input" type="text" placeholder="Enter your name">
+                <button class="button is-primary" onclick="startGame()">Start Game</button>
+                <div id="error-notification" class="notification is-danger"></div>
+            </div>
+            <div id="game" class="is-hidden">
+                <div class="dog-image-container">
+                    <img id="dog-image" src="" alt="Dog Image" class="image fade-in">
+                    <p id="score" class="score button is-danger">Score: 0</p>
+                </div>
+                <div id="options" class="buttons is-centered"></div>
+                <div id="feedback" class="notification is-hidden"></div>
+                <button class="button is-danger" onclick="resetGame()">Exit Game</button>
+            </div>
+            <div id="leaderboard-container">
+                <h2 class="title">Leaderboard</h2>
+                <ul id="leaderboard"></ul>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
