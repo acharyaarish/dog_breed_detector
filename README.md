@@ -4,6 +4,13 @@
 
 The Dog Breed Detector is a web application that allows users to identify the breed of a dog from an image. Users can upload a picture of a dog, and the application will predict the breed using a pre-trained machine learning model. The app also displays random dog images using the Dog CEO API for users to guess the breed.
 
+![473BE679-E59E-49E9-9270-DBEC058A06CB](https://github.com/user-attachments/assets/ba7c42b3-37ca-452e-8f50-610943cfca72)
+
+![4686B2EF-5F78-4D64-B185-A47826371F2E](https://github.com/user-attachments/assets/1d172949-3692-4152-b1b6-a41d2c66e125)
+
+![E7F77389-1968-4C81-82BE-CA1D0D7A66CF](https://github.com/user-attachments/assets/216d0798-2f13-43ff-a638-cd9d070e719f)
+
+
 ## Features
 
 - Displays a random dog image from the Dog CEO API for users to guess the breed.
