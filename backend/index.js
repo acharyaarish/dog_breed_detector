@@ -2,21 +2,38 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
+const mysql = require('mysql2');
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 8080;
 
-app.use(cors());
-app.use(bodyParser.json());
-
-// Initialize SQLite database
-const db = new sqlite3.Database(':memory:');
-
-db.serialize(() => {
-  db.run('CREATE TABLE leaderboard (id INTEGER PRIMARY KEY AUTOINCREMENT, user_name TEXT, score INTEGER)');
+// MySQL database connection
+const db = mysql.createConnection({
+  host: process.env.DB_HOST, // Use environment variables for sensitive information
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
 });
 
+// Connect to the database
+db.connect(err => {
+  if (err) {
+    console.error('Could not connect to the database:', err);
+    process.exit(1);
+  } else {
+    console.log('Connected to the MySQL database.');
+  }
+});
+
+// Middleware
+app.use(cors({
+  origin: 'http://dog-breed-detector.s3-website-ap-southeast-2.amazonaws.com',
+  methods: 'GET,POST,PUT,DELETE',
+  allowedHeaders: 'Content-Type,Authorization'
+}));
+app.use(bodyParser.json());
+
+// API to get all dog breeds
 app.get('/breeds', async (req, res) => {
   try {
     const response = await axios.get('https://dog.ceo/api/breeds/list/all');
@@ -28,6 +45,7 @@ app.get('/breeds', async (req, res) => {
   }
 });
 
+// API to get a random dog image and breed
 app.get('/random_dog', async (req, res) => {
   try {
     const response = await axios.get('https://dog.ceo/api/breeds/image/random');
@@ -40,9 +58,11 @@ app.get('/random_dog', async (req, res) => {
   }
 });
 
+// API to submit a score
 app.post('/submit_score', (req, res) => {
   const { user_name, score } = req.body;
-  db.run('INSERT INTO leaderboard (user_name, score) VALUES (?, ?)', [user_name, score], (err) => {
+  const query = 'INSERT INTO leaderboard (user_name, score) VALUES (?, ?) ON DUPLICATE KEY UPDATE score = GREATEST(score, VALUES(score))';
+  db.query(query, [user_name, score], (err, result) => {
     if (err) {
       console.error('Error inserting score:', err);
       res.status(500).send('Error inserting score');
@@ -52,17 +72,20 @@ app.post('/submit_score', (req, res) => {
   });
 });
 
+// API to get the leaderboard
 app.get('/leaderboard', (req, res) => {
-  db.all('SELECT * FROM leaderboard ORDER BY score DESC LIMIT 1', (err, rows) => {
+  const query = 'SELECT user_name, MAX(score) as score FROM leaderboard GROUP BY user_name ORDER BY score DESC LIMIT 10';
+  db.query(query, (err, results) => {
     if (err) {
       console.error('Error fetching leaderboard:', err);
       res.status(500).send('Error fetching leaderboard');
     } else {
-      res.json({ leaderboard: rows });
+      res.json({ leaderboard: results });
     }
   });
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
